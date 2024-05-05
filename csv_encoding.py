@@ -3,10 +3,10 @@
 import os
 
 
-code: dict = {"mac": 'MacCyrillic', "windows": 'windows-1251', "utf": 'utf-8', "latin1": "iso-8859-1"}
+enc: dict = {"mac": 'MacCyrillic', "windows": 'windows-1251', "utf": 'utf-8', "latin1": "iso-8859-1"}
 mac_dir: str = os.path.join(os.getcwd(), 'mac_cyrillic')
 win_dir: str = os.path.join(os.getcwd(), 'windows_1251')
-
+files_csv: list[str] = [csv for csv in os.listdir(os.getcwd()) if csv.endswith('.csv')]
 
 def convert_encoding(input_file: str, out_path: str, input_encoding: str, output_encoding: str) -> None:
     """
@@ -33,28 +33,28 @@ def convert_encoding(input_file: str, out_path: str, input_encoding: str, output
           f"{'-' * 50}\n")
 
 
+def main():
+    command_to_convert = input(f'{"-" * 50}\n'
+                               f'Найдены следующие файлы: {files_csv}\n'
+                               f'Конвертировать их в другую кодирову?\n'
+                               f'Нажмите [Enter] или введите "Нет" '
+                               f'\n{"-" * 50}\n')
 
-files_csv: list[str] = [csv for csv in os.listdir(os.getcwd()) if csv.endswith('.csv')]
-command_to_convert = input(f'{"-" * 50}\n'
-                           f'Найдены следующие файлы: {files_csv}\n'
-                           f'Конвертировать их в другую кодирову?\n'
-                           f'Нажмите [Enter] или введите "Нет" '
-                           f'\n{"-" * 50}\n')
+    if command_to_convert.lower() == 'нет':
+        exit(0)
 
-if command_to_convert.lower() == 'нет':
-    exit(0)
+    for file_name in files_csv:
+        file_path = os.path.join(os.getcwd(), file_name)
+        print(f"{'-' * 50}\n{file_path}")
+        try:
+            os.makedirs('mac_cyrillic', exist_ok=True)
+            convert_encoding(file_path, out_path=mac_dir, input_encoding=enc['windows'], output_encoding=enc['mac'])
+        except:
+            os.makedirs('windows_1251', exist_ok=True)
+            convert_encoding(input_file=file_path, out_path=win_dir, input_encoding=enc['mac'], output_encoding=enc['windows'])
 
-for file_name in files_csv:
-    file_path = os.path.join(os.getcwd(), file_name)
-    print(f"{'-' * 50}\n{file_path}")
-    try:
-        if not os.path.exists(mac_dir):
-            os.mkdir('mac_cyrillic')
-        convert_encoding(file_path,  out_path=mac_dir, input_encoding=code['windows'], output_encoding=code['mac'])
-    except:
-        if not os.path.exists(win_dir):
-            os.mkdir('windows_1251')
-        convert_encoding(input_file=file_path, out_path=win_dir, input_encoding=code['mac'], output_encoding=code['windows'])
+    input('Нажмите любую клавишу чтобы закрыть окно')
 
-input('Нажмите любую клавишу чтобы закрыть окно')
+if __name__ == "__main__":
+    main()
 
